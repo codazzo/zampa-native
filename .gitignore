@@ -16,4 +16,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+ios/zampanative.xcodeproj/project.xcworkspace/xcuserdata/codazzo.xcuserdatad/UserInterfaceState.xcuserstate
+
 data.json
