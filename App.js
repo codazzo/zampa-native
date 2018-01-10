@@ -9,7 +9,6 @@ import {
 import { Marker } from 'react-native-maps';
 import ClusteredMapView from 'react-native-maps-super-cluster';
 
-import ScatterPlot from './components/ScatterPlot';
 import styles from './App.styles';
 import data from './data.json';
 
@@ -90,8 +89,6 @@ export default class App extends Component {
             bottom: 64,
           }}
         />
-
-        <ScatterPlot timestamps={data.tags.map(tag => tag.timestamp)} />
 
         <View style={styles.controlBar}>
           <TouchableOpacity
