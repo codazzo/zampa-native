@@ -1,109 +1,91 @@
-'use-strict';
+/* eslint-disable react/no-unused-state */
 
-import React, { Component } from 'react';
+import * as React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { TabViewAnimated, TabBar } from 'react-native-tab-view';
+import TracksMapView from './components/TracksMapView';
 import {
-  Text,
-  View,
-  TouchableOpacity,
-} from 'react-native';
-import { Marker } from 'react-native-maps';
-import ClusteredMapView from 'react-native-maps-super-cluster';
+  blue,
+  white,
+} from './colors';
 
-import styles from './App.styles';
-import data from './data.json';
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginTop: 20,
+  },
+  tabbar: {
+    backgroundColor: white,
+  },
+  indicator: {
+    backgroundColor: blue,
+  },
+});
 
-const centerLatitude = 41.8962667;
-const centerLongitude = 11.3340056;
+const renderScene = ({ route }) => { // eslint-disable-line react/prop-types
+  switch (route.key) {
+    case '1':
+      return (
+        <TracksMapView />
+      );
+    case '2':
+      return (
+        <View>
+          <Text>
+            View 2
+          </Text>
+        </View>
+      );
+    default:
+      return null;
+  }
+};
 
-const renderMarker = pin => (
-  <Marker
-    key={pin.id || Math.random()}
-    coordinate={pin.location}
+const renderIcon = ({ route }) => ( // eslint-disable-line react/prop-types
+  <Ionicons
+    name={route.icon}
+    size={24}
+    color={blue}
   />
 );
 
-const renderCluster = (cluster, onPress) => {
-  const {
-    pointCount,
-    coordinate,
-  } = cluster;
+const renderHeader = props => (
+  <TabBar
+    {...props}
+    indicatorStyle={styles.indicator}
+    renderIcon={renderIcon}
+    style={styles.tabbar}
+  />
+);
 
-  return (
-    <Marker onPress={onPress} coordinate={coordinate} key={cluster.clusterId}>
-      <View style={styles.clusterContainer}>
-        <Text style={styles.counterText}>{pointCount}</Text>
-      </View>
-    </Marker>
-  );
-};
-
-export default class App extends Component {
-  constructor(props) {
-    super(props);
-
+export default class App extends React.Component {
+  constructor() {
+    super();
     this.state = {
-      pins: [],
+      index: 0,
+      routes: [
+        { key: '1', icon: 'md-map' },
+        { key: '2', icon: 'md-list' },
+      ],
     };
-
-    this.loadPins = this.loadPins.bind(this);
   }
 
-  componentDidMount() {
-    this.loadPins();
-  }
-
-  loadPins() {
-    const pins = data.tags
-      .filter(tag => tag.geolocation)
-      .map((tag, i) => ({
-        id: `pin${i}`,
-        location: tag.geolocation,
-      }));
-
+  handleIndexChange(index) {
     this.setState({
-      pins,
+      index,
     });
   }
 
   render() {
     return (
-      <View style={styles.container}>
-        <ClusteredMapView
-          style={{ flex: 1 }}
-          data={this.state.pins}
-          ref={(r) => { this.map = r; }}
-          textStyle={{ color: '#65bc46' }}
-          renderMarker={renderMarker}
-          renderCluster={renderCluster}
-          preserveClusterPressBehavior
-          initialRegion={{
-            latitude: centerLatitude,
-            longitude: centerLongitude,
-            latitudeDelta: 12,
-            longitudeDelta: 12,
-          }}
-          edgePadding={{
-            top: 32,
-            left: 10,
-            right: 64,
-            bottom: 64,
-          }}
-        />
-
-        <View style={styles.controlBar}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={this.loadPins}
-          >
-            <Text style={styles.text}>loadPins</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-          >
-            <Text style={styles.text}>Something else</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <TabViewAnimated
+        style={styles.container}
+        navigationState={this.state}
+        renderScene={renderScene}
+        renderHeader={renderHeader}
+        onIndexChange={index => this.handleIndexChange(index)}
+      />
     );
   }
 }
