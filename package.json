@@ -27,7 +27,10 @@
   "dependencies": {
     "@expo/vector-icons": "^6.2.2",
     "expo": "^23.0.4",
-    "prop-types": "^15.6.0",
+    "lodash.uniqby": "^4.7.0",
+    "mobx": "^3.4.1",
+    "mobx-react": "^4.4.3",
+    "prop-types": "^15.6.1",
     "react": "16.0.0",
     "react-native": "0.50.3",
     "react-native-maps": "^0.19.0",

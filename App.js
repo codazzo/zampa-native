@@ -4,7 +4,10 @@ import * as React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { TabViewAnimated, TabBar } from 'react-native-tab-view';
+import { observer } from 'mobx-react';
+
 import TracksMapView from './components/TracksMapView';
+import store from './store';
 import {
   blue,
   white,
@@ -59,9 +62,12 @@ const renderHeader = props => (
   />
 );
 
-export default class App extends React.Component {
+class App extends React.Component {
   constructor() {
     super();
+
+    store.fetchTags();
+
     this.state = {
       index: 0,
       routes: [
@@ -89,3 +95,5 @@ export default class App extends React.Component {
     );
   }
 }
+
+export default observer(App);
