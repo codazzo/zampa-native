@@ -2,17 +2,18 @@ import React, { Component } from 'react';
 import {
   Text,
   View,
-  AsyncStorage,
   Dimensions,
 } from 'react-native';
 import { Marker } from 'react-native-maps';
 import ClusteredMapView from 'react-native-maps-super-cluster';
+import { observer } from 'mobx-react';
+
+import { store as storePropType } from './propTypes';
 import styles from './TracksMapView.styles';
 
 const centerLatitude = 41.8962667;
 const centerLongitude = 11.3340056;
 const DRAGGABLE_MAP_AREA_WIDTH = 40;
-const TAGS_CACHE_KEY = 'TAGS_CACHE';
 
 const renderMarker = pin => (
   <Marker
@@ -20,8 +21,6 @@ const renderMarker = pin => (
     coordinate={pin.location}
   />
 );
-
-const getData = async () => JSON.parse(await AsyncStorage.getItem(TAGS_CACHE_KEY));
 
 const renderCluster = (cluster, onPress) => {
   const {
@@ -38,23 +37,31 @@ const renderCluster = (cluster, onPress) => {
   );
 };
 
-export default class TracksMapView extends Component {
-  constructor(props) {
-    super(props);
 
-    this.state = {
-      pins: [],
-    };
+class TracksMapView extends Component {
+  onRegionChangeComplete(region) {
+    const {
+      latitude,
+      longitude,
+      latitudeDelta,
+      longitudeDelta,
+    } = region;
 
-    this.loadPins = this.loadPins.bind(this);
+    const minLat = latitude - (latitudeDelta / 2);
+    const maxLat = latitude + (latitudeDelta / 2);
+    const minLng = longitude - (longitudeDelta / 2);
+    const maxLng = longitude + (longitudeDelta / 2);
+
+    this.props.store.setBounds({
+      minLat,
+      maxLat,
+      minLng,
+      maxLng,
+    });
   }
 
-  async componentDidMount() {
-    const data = await getData();
-    this.loadPins(data.tags);
-  }
-
-  loadPins(tags) {
+  render() {
+    const tags = this.props.store.tagsInRange.get();
     const pins = tags
       .filter(tag => tag.geolocation)
       .map((tag, i) => ({
@@ -62,21 +69,16 @@ export default class TracksMapView extends Component {
         location: tag.geolocation,
       }));
 
-    this.setState({
-      pins,
-    });
-  }
-
-  render() {
     return (
       <View style={styles.container}>
         <ClusteredMapView
           style={{ flex: 1 }}
-          data={this.state.pins}
+          data={pins}
           ref={(r) => { this.map = r; }}
           renderMarker={renderMarker}
           renderCluster={renderCluster}
           preserveClusterPressBehavior
+          onRegionChangeComplete={region => this.onRegionChangeComplete(region)}
           animateClusters={false}
           initialRegion={{
             latitude: centerLatitude,
@@ -106,3 +108,9 @@ export default class TracksMapView extends Component {
     );
   }
 }
+
+TracksMapView.propTypes = {
+  store: storePropType.isRequired,
+};
+
+export default observer(TracksMapView);

@@ -30,7 +30,7 @@ const renderScene = ({ route }) => { // eslint-disable-line react/prop-types
   switch (route.key) {
     case '1':
       return (
-        <TracksMapView />
+        <TracksMapView store={store} />
       );
     case '2':
       return (
