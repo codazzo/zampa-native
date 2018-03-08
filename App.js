@@ -1,12 +1,13 @@
 /* eslint-disable react/no-unused-state */
 
 import * as React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { TabViewAnimated, TabBar } from 'react-native-tab-view';
 import { observer } from 'mobx-react';
 
 import TracksMapView from './components/TracksMapView';
+import TagListView from './components/TagListView';
 import store from './store';
 import {
   blue,
@@ -34,11 +35,7 @@ const renderScene = ({ route }) => { // eslint-disable-line react/prop-types
       );
     case '2':
       return (
-        <View>
-          <Text>
-            View 2
-          </Text>
-        </View>
+        <TagListView store={store} />
       );
     default:
       return null;
